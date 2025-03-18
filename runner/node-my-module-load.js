@@ -8,7 +8,7 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const makeModule = require('.');
+const makeModule = require('..');
 
 const Module = makeModule({
     isFile(path) {
@@ -33,4 +33,4 @@ const Module = makeModule({
 
 const p = path.resolve(process.argv[2]);
 let m = Module._load(p, null);
-console.log("loaded:", m)
+console.log("loaded:", JSON.stringify(m))

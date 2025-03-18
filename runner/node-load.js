@@ -9,4 +9,4 @@ if (process.argv.length < 3) {
 
 const p = path.resolve(process.argv[2]);
 let m = require(p);
-console.log("loaded:", m)
+console.log("loaded:", JSON.stringify(m))

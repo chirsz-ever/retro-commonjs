@@ -7,7 +7,7 @@ interface ModuleConfig {
     realpath(path: string): string;
 }
 
-declare class Module { };
+declare class Module { }
 
 function makeModule(config: ModuleConfig) {
 
