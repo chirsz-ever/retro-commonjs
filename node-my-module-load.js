@@ -8,9 +8,9 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const getModule = require('.');
+const makeModule = require('.');
 
-const Module = getModule({
+const Module = makeModule({
     isFile(path) {
         return fs.existsSync(path) && fs.statSync(path).isFile();
     },
@@ -23,6 +23,12 @@ const Module = getModule({
     resolve(...paths) {
         return path.resolve(...paths);
     },
+    modulePathResolve(_request, _parent) {
+        throw new Error("Not implemented");
+    },
+    realpath(p) {
+        return fs.realpathSync(p);
+    }
 });
 
 const p = path.resolve(process.argv[2]);

@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read
 
 import { existsSync } from "jsr:@std/fs";
+import makeModule from "./dist/module.js";
 
 if (Deno.args.length < 1) {
     const name = Deno.mainModule.substring(Deno.mainModule.lastIndexOf('/') + 1);
@@ -16,7 +17,7 @@ function resolve(...paths: string[]): string {
         }
         // 否则将路径拼接到当前路径
         return `${acc}/${path}`;
-    }, process.cwd());
+    }, Deno.cwd());
 
     // 规范化路径，去除多余的斜杠, 尾随斜杠和相对路径
     resolvedPath = resolvedPath.replace(/\/+/g, '/');
@@ -26,7 +27,7 @@ function resolve(...paths: string[]): string {
     }
 
     // 在 Windows 上，路径会以 `/` 开头，需要去掉
-    if (process.platform === 'win32' && resolvedPath.startsWith('/')) {
+    if (Deno.build.os === 'windows' && resolvedPath.startsWith('/')) {
         resolvedPath = resolvedPath.slice(1);
     }
 
@@ -36,7 +37,7 @@ function resolve(...paths: string[]): string {
 const moduleText = await Deno.readTextFile("./dist/module.js");
 eval(moduleText);
 
-const Module = getModule({
+const Module = makeModule({
     isFile(path) {
         return existsSync(path, { isFile: true });
     },
@@ -47,6 +48,12 @@ const Module = getModule({
         return Deno.readTextFileSync(path);
     },
     resolve,
+    modulePathResolve(_request, _parent) {
+        throw new Error("Not implemented");
+    },
+    realpath(p) {
+        return Deno.realPathSync(p);
+    }
 });
 
 const p = resolve(Deno.args[0]);

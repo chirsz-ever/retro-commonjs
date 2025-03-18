@@ -2,10 +2,14 @@ interface ModuleConfig {
     isFile: (path: string) => boolean;
     isDirectory: (path: string) => boolean;
     readFileSync(path: string, encoding: 'utf8'): string;
-    resolve(...paths: string[]): string;
+    resolve(base: string, relative: string): string;
+    modulePathResolve(request: string, parent: Module | null): string | undefined;
+    realpath(path: string): string;
 }
 
-function getModule(config: ModuleConfig) {
+declare class Module { };
+
+function makeModule(config: ModuleConfig) {
 
     // 参照 Node 20
     // https://nodejs.org/docs/latest-v20.x/api/module.html
@@ -59,8 +63,6 @@ function getModule(config: ModuleConfig) {
 
         static builtInModules: string[] = [
             "module",
-            "path",
-            "fs",
         ];
 
         static _mainModule: Module;
@@ -131,103 +133,30 @@ function getModule(config: ModuleConfig) {
             if (request.startsWith('./') || request.startsWith('../') || request.startsWith('/')) {
                 var fullName = config.resolve(dirname(parent?.filename || '.'), request);
 
-                if (filename = load_as_file(fullName)) {
-                    return filename;
+                if (!request.endsWith('/') && (filename = load_as_file(fullName))) {
+                    return config.realpath(filename);
                 }
 
                 if (filename = load_as_directory(fullName)) {
-                    return filename;
+                    return config.realpath(filename);
                 }
 
                 throw new Error("Cannot find module '" + request + "'");
             }
 
-            if (request.startsWith('#')) {
-                throw new Error("not support package imports");
-            }
+            // if (request.startsWith('#')) {
+            //     throw new Error("not support package imports");
+            // }
 
-            // 第二步：确定所有可能的路径
-            var resolvedModule = Module._resolveLookupPaths(request, parent);
-            var id = resolvedModule[0];
-            var paths = resolvedModule[1];
+            filename = Module._customModulePathResolve(request, parent);
+            if (filename)
+                return filename;
 
-            // 第三步：确定哪一个路径为真
-            filename = Module._findPath(request, paths);
-            if (!filename) {
-                var err = new Error("Cannot find module '" + request + "'");
-                (err as any).code = 'MODULE_NOT_FOUND';
-                throw err;
-            }
-            return filename;
+            throw new Error("Cannot find module '" + request + "'");
         };
 
-        static _resolveLookupPaths(request: string, parent: Module | null): [string, string[]] {
-            if (Module.isBuiltin(request)) {
-                return [request, []];
-            }
-
-            var start = request.substring(0, 2);
-            if (start !== './' && start !== '..') {
-                var paths: string[] = modulePaths;
-                if (parent) {
-                    if (!parent.paths) parent.paths = [];
-                    paths = parent.paths.concat(paths);
-                }
-                return [request, paths];
-            }
-
-            // with --eval, parent.id is not set and parent.filename is null
-            if (!parent || !parent.id || !parent.filename) {
-                // make require('./path/to/foo') work - normally the path is taken
-                // from realpath(__filename) but with eval there is no filename
-                var mainPaths = ['.'].concat(modulePaths);
-                mainPaths = Module._nodeModulePaths('.').concat(mainPaths);
-                return [request, mainPaths];
-            }
-
-            // Is the parent an index module?
-            // We can assume the parent has a valid extension,
-            // as it already has been accepted as a module.
-            var isIndex = /\/index\.\w+?$/.test(parent.filename);
-            var parentIdPath = isIndex ? parent.id : dirname(parent.id);
-            var id = config.resolve(parentIdPath, request);
-
-            // make sure require('./path') and require('path') get distinct ids, even
-            // when called from the toplevel js file
-            if (parentIdPath === '.' && id.indexOf('/') === -1) {
-                id = './' + id;
-            }
-
-            return [id, [dirname(parent.filename)]];
-        }
-
-        static _nodeModulePaths(from: string): string[] {
-            from = config.resolve(from);
-            var paths: string[] = [];
-            var parts = from.split('/');
-
-            for (var tip = parts.length - 1; tip >= 0; tip--) {
-                // don't search in .../node_modules/node_modules
-                if (parts[tip] === 'node_modules') continue;
-                var dir = parts.slice(0, tip + 1).concat('node_modules').join('/');
-                paths.push(dir);
-            }
-
-            return paths;
-        }
-
-        static _findPath(request: string, paths: string[]): string | null {
-            var filename: string | undefined;
-            for (var p of paths) {
-                var p1 = p + '/' + request;
-                if (filename = load_as_file(p1)) {
-                    return filename;
-                }
-                if (filename = load_as_directory(p1)) {
-                    return filename;
-                }
-            }
-            return null;
+        static _customModulePathResolve(request: string, parent: Module | null): string | undefined {
+            return config.modulePathResolve(request, parent);
         }
 
         _compile(content: string, filename: string): void {
@@ -270,7 +199,7 @@ function getModule(config: ModuleConfig) {
 
         load(filename: string) {
             this.filename = filename;
-            this.paths = Module._nodeModulePaths(dirname(filename));
+            // this.paths = Module._nodeModulePaths(dirname(filename));
             var extension = extname(filename) || '.js';
             if (!Module._extensions[extension]) extension = '.js';
             Module._extensions[extension](this, filename);
@@ -392,8 +321,8 @@ function getModule(config: ModuleConfig) {
     return Module;
 };
 
-globalThis.getModule = getModule;
-
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = getModule;
+    module.exports = makeModule;
+} else {
+    Function('return this')().makeModule = makeModule;
 }
