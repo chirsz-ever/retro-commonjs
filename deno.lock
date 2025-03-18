@@ -18,7 +18,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@types/node@^20.17.24"
+        "npm:@types/node@^20.17.24",
+        "npm:ses@^1.11.0"
       ]
     }
   }
