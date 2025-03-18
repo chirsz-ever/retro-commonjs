@@ -5,7 +5,7 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const getModule = require('./module');
+const getModule = require('.');
 
 const path = require('path');
 const fs = require('fs');
