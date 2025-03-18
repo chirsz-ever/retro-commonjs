@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
+const path = require('path');
+const fs = require('fs');
+
 if (process.argv.length < 3) {
-    console.log('Usage: node require-test.js <module-name>');
+    console.log(`Usage: node ${path.basename(process.argv[1])} <module-name>`);
     process.exit(1);
 }
 
 const getModule = require('.');
-
-const path = require('path');
-const fs = require('fs');
 
 const Module = getModule({
     isFile(path) {

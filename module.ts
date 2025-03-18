@@ -82,7 +82,7 @@ function getModule(config: ModuleConfig) {
             return Module._load(id, this);
         }
 
-        static _load(request: string, parent: Module, isMain?: boolean): any {
+        static _load(request: string, parent: Module | null, isMain?: boolean): any {
             // built-in modules
             if (Module.isBuiltin(request)) {
                 return loadBuiltinModule(request);
@@ -119,7 +119,7 @@ function getModule(config: ModuleConfig) {
             return module.exports;
         }
 
-        static _resolveFilename(request: string, parent: Module): string {
+        static _resolveFilename(request: string, parent: Module | null): string {
             // 如果是内置模块，不含路径返回
             if (Module.isBuiltin(request)) {
                 return request;
@@ -161,7 +161,7 @@ function getModule(config: ModuleConfig) {
             return filename;
         };
 
-        static _resolveLookupPaths(request: string, parent: Module): [string, string[]] {
+        static _resolveLookupPaths(request: string, parent: Module | null): [string, string[]] {
             if (Module.isBuiltin(request)) {
                 return [request, []];
             }
@@ -378,6 +378,8 @@ function getModule(config: ModuleConfig) {
 
     return Module;
 };
+
+globalThis.getModule = getModule;
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = getModule;
