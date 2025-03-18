@@ -1,6 +1,6 @@
 exports.index_done = false;
 
-console.log(__filename, "this:", this)
+console.log(__filename, "this:", JSON.stringify(this))
 
 const a = require("./a.js");
 
