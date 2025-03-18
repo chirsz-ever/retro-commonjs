@@ -13,17 +13,20 @@ function resolve(...paths: string[]): string {
         if (path.startsWith('/')) {
             // 如果路径是绝对路径，直接使用该路径
             return path;
-        } else {
-            // 否则将路径拼接到当前路径
-            return `${acc}/${path}`;
         }
-    }, Deno.cwd());
+        // 否则将路径拼接到当前路径
+        return `${acc}/${path}`;
+    }, process.cwd());
 
-    // 规范化路径，去除多余的斜杠和相对路径
+    // 规范化路径，去除多余的斜杠, 尾随斜杠和相对路径
+    resolvedPath = resolvedPath.replace(/\/+/g, '/');
     resolvedPath = new URL(`file://${resolvedPath}`).pathname;
+    if (resolvedPath !== '/' && resolvedPath.endsWith('/')) {
+        resolvedPath = resolvedPath.slice(0, -1);
+    }
 
     // 在 Windows 上，路径会以 `/` 开头，需要去掉
-    if (Deno.build.os === 'windows' && resolvedPath.startsWith('/')) {
+    if (process.platform === 'win32' && resolvedPath.startsWith('/')) {
         resolvedPath = resolvedPath.slice(1);
     }
 
