@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-read
+#!/usr/bin/env -S deno run --allow-read --allow-env
 
 import "ses"
 
@@ -11,12 +11,21 @@ if (Deno.args.length < 1) {
     Deno.exit(1);
 }
 
+lockdown();
+
+const c = new Compartment({
+    globals: {
+        console,
+    },
+    __options__: true, // temporary migration affordance
+});
+
 const cwd = Deno.cwd();
 
 const moduleText = await Deno.readTextFile(new URL(import.meta.resolve("../dist/module.js")).pathname);
-const makeModule = eval(moduleText);
+const makeModule = c.evaluate(moduleText);
 
-const Module = makeModule({
+c.globalThis.Module = makeModule({
     isFile(path) {
         return existsSync(path, { isFile: true });
     },
@@ -33,14 +42,6 @@ const Module = makeModule({
     realpath(p) {
         return Deno.realPathSync(p);
     }
-});
-
-const c = new Compartment({
-    globals: {
-        console,
-        Module,
-    },
-    __options__: true, // temporary migration affordance
 });
 
 const p = resolve(cwd, Deno.args[0]);

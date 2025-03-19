@@ -2,6 +2,8 @@
 
 require('ses');
 
+lockdown();
+
 const path = require('path');
 const fs = require('fs');
 
@@ -10,9 +12,16 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const makeModule = require('..');
+const c = new Compartment({
+    globals: {
+        console,
+    },
+    __options__: true, // temporary migration affordance
+});
 
-const Module = makeModule({
+const makeModule = c.evaluate(fs.readFileSync(path.resolve(__dirname, '../dist/module.js'), 'utf8'));
+
+c.globalThis.Module = makeModule({
     isFile(path) {
         return fs.existsSync(path) && fs.statSync(path).isFile();
     },
@@ -31,14 +40,6 @@ const Module = makeModule({
     realpath(p) {
         return fs.realpathSync(p);
     }
-});
-
-const c = new Compartment({
-    globals: {
-        console,
-        Module,
-    },
-    __options__: true, // temporary migration affordance
 });
 
 const p = path.resolve(process.argv[2]);
