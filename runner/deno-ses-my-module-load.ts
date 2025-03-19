@@ -22,6 +22,7 @@ const c = new Compartment({
 
 const cwd = Deno.cwd();
 
+// must evaluate in a compartment
 const moduleText = await Deno.readTextFile(new URL(import.meta.resolve("../dist/module.js")).pathname);
 const makeModule = c.evaluate(moduleText);
 

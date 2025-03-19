@@ -19,6 +19,7 @@ const c = new Compartment({
     __options__: true, // temporary migration affordance
 });
 
+// must evaluate in a compartment
 const makeModule = c.evaluate(fs.readFileSync(path.resolve(__dirname, '../dist/module.js'), 'utf8'));
 
 c.globalThis.Module = makeModule({
