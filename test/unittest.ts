@@ -2,9 +2,7 @@ import { dirname } from '../util/dirname';
 import { resolve as resolve_ } from '../util/resolve';
 
 function resolve(...paths: string[]): string {
-    return resolve_({
-        cwd: process.cwd(),
-    }, ...paths);
+    return resolve_(process.cwd(), ...paths);
 }
 
 import assert = require('node:assert');

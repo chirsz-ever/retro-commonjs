@@ -12,7 +12,7 @@ if (Deno.args.length < 1) {
 const cwd = Deno.cwd();
 
 const moduleText = await Deno.readTextFile(new URL(import.meta.resolve("../dist/module.js")).pathname);
-eval(moduleText);
+const makeModule = eval(moduleText);
 
 const Module = makeModule({
     isFile(path) {
@@ -24,7 +24,7 @@ const Module = makeModule({
     readFileSync(path, _encoding) {
         return Deno.readTextFileSync(path);
     },
-    resolve: (...paths) => resolve({ cwd }, ...paths),
+    resolve,
     modulePathResolve(_request, _parent) {
         throw new Error("Not implemented");
     },
@@ -33,6 +33,6 @@ const Module = makeModule({
     }
 });
 
-const p = resolve({ cwd }, Deno.args[0]);
+const p = resolve(cwd, Deno.args[0]);
 const m = Module._load(p, null);
 console.log("loaded:", JSON.stringify(m))

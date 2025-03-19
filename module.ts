@@ -323,6 +323,7 @@ function makeModule(config: ModuleConfig) {
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = makeModule;
-} else {
-    Function('return this')().makeModule = makeModule;
 }
+
+// for eval use
+makeModule;

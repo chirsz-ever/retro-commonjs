@@ -9,14 +9,14 @@ const exec = promisify(cp.exec);
 
 test('load', async () => {
     async function testLoad(mod) {
-        const results = await Promise.all([
-            exec(`node "${__dirname}/../runner/node-load.js" "${mod}"`).toString('utf-8'),
-            exec(`node "${__dirname}/../runner/node-my-module-load.js" "${mod}"`).toString('utf-8'),
-            exec(`deno run -A "${__dirname}/../runner/deno-my-module-load.ts" "${mod}"`).toString('utf-8'),
-            exec(`qjs "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`).toString('utf-8'),
-            exec(`node "${__dirname}/../runner/node-ses-my-module-load.js" "${mod}"`).toString('utf-8'),
-            exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`).toString('utf-8'),
-        ]);
+        const results = (await Promise.all([
+            exec(`node "${__dirname}/../runner/node-load.js" "${mod}"`),
+            exec(`node "${__dirname}/../runner/node-my-module-load.js" "${mod}"`),
+            exec(`deno run -A "${__dirname}/../runner/deno-my-module-load.ts" "${mod}"`),
+            exec(`qjs "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
+            exec(`node "${__dirname}/../runner/node-ses-my-module-load.js" "${mod}"`),
+            exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`),
+        ])).map(r => r.stdout);
 
         for (let i = 1; i < results.length; i++) {
             assert.strictEqual(results[0], results[i], `${mod} on index ${i}`);

@@ -37,7 +37,7 @@ try {
 
     // debug("resolve:", resolve)
 
-    std.loadScript(_dirname + "/../dist/module.js");
+    const makeModule = std.loadScript(_dirname + "/../dist/module.js");
 
     // debug("makeModule loaded", makeModule)
 
@@ -60,9 +60,7 @@ try {
         readFileSync(path, _encoding) {
             return std.loadFile(path);
         },
-        resolve(p1, p2) {
-            return resolve({ cwd }, p1, p2);
-        },
+        resolve,
         modulePathResolve(_request, _parent) {
             throw new Error("Not implemented");
         },
@@ -76,7 +74,7 @@ try {
     });
 
     // debug("Module:", Module)
-    const p = resolve({ cwd }, scriptArgs[1]);
+    const p = resolve(cwd, scriptArgs[1]);
     debug("p:", p)
     // debug("Module._load:", Module._load)
     let m = Module._load(p, null);
