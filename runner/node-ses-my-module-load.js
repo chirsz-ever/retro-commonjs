@@ -20,7 +20,10 @@ const c = new Compartment({
 });
 
 // must evaluate in a compartment
-const makeModule = c.evaluate(fs.readFileSync(path.resolve(__dirname, '../dist/module.js'), 'utf8'));
+// const makeModule = c.evaluate(fs.readFileSync(path.resolve(__dirname, '../dist/module.js'), 'utf8'));
+// or provide the Function
+
+const makeModule = require("..").makeModule;
 
 c.globalThis.Module = makeModule({
     isFile(path) {
@@ -40,7 +43,8 @@ c.globalThis.Module = makeModule({
     },
     realpath(p) {
         return fs.realpathSync(p);
-    }
+    },
+    Function: c.globalThis.Function,
 });
 
 const p = path.resolve(process.argv[2]);

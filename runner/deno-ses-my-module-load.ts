@@ -4,6 +4,7 @@ import "ses"
 
 import { existsSync } from "jsr:@std/fs";
 import { resolve } from "../util/resolve.ts";
+import makeModule from "../module.ts";
 
 if (Deno.args.length < 1) {
     const name = Deno.mainModule.substring(Deno.mainModule.lastIndexOf('/') + 1);
@@ -22,10 +23,6 @@ const c = new Compartment({
 
 const cwd = Deno.cwd();
 
-// must evaluate in a compartment
-const moduleText = await Deno.readTextFile(new URL(import.meta.resolve("../dist/module.js")).pathname);
-const makeModule = c.evaluate(moduleText);
-
 c.globalThis.Module = makeModule({
     isFile(path) {
         return existsSync(path, { isFile: true });
@@ -42,7 +39,8 @@ c.globalThis.Module = makeModule({
     },
     realpath(p) {
         return Deno.realPathSync(p);
-    }
+    },
+    Function: c.globalThis.Function,
 });
 
 const p = resolve(cwd, Deno.args[0]);

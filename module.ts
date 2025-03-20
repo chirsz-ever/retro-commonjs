@@ -5,11 +5,12 @@ interface ModuleConfig {
     resolve(base: string, relative: string): string;
     modulePathResolve(request: string, parent: Module | null): string | undefined;
     realpath(path: string): string;
+    Function?: FunctionConstructor;
 }
 
 declare class Module { }
 
-function makeModule(config: ModuleConfig) {
+export function makeModule(config: ModuleConfig) {
 
     // 参照 Node 20
     // https://nodejs.org/docs/latest-v20.x/api/module.html
@@ -177,6 +178,7 @@ function makeModule(config: ModuleConfig) {
 
             require.cache = Module._cache;
 
+            const Function = config.Function ?? globalThis.Function;
             const mod_func = Function('exports', 'require', 'module', '__filename', '__dirname', content);
             const mod__dirname = dirname(filename);
             var args = [self.exports, require, self, filename, mod__dirname];
@@ -319,11 +321,6 @@ function makeModule(config: ModuleConfig) {
     var modulePaths: string[] = [];
 
     return Module;
-};
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = makeModule;
 }
 
-// for eval use
-makeModule;
+export default makeModule;

@@ -8,7 +8,7 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const makeModule = require('..');
+const makeModule = require('..').makeModule;
 
 const Module = makeModule({
     isFile(path) {

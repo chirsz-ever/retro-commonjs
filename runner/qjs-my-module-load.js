@@ -18,26 +18,19 @@ try {
         return p.substring(0, p.lastIndexOf("/"));
     }
 
-    function load_cjs(path) {
-        // console.log(`Loading CJS module from ${path}`);
-        const require = () => { throw new Error("Not implemented") };
-        const module = { exports: {} };
-        const __filename = path;
-        const __dirname = dirname(path);
-        const args = [module.exports, require, module, __filename, __dirname];
-        Function('exports', 'require', 'module', '__filename', '__dirname', std.loadFile(path)).apply(module.exports, args);
-        return module.exports;
-    }
-
     const _dirname = dirname(scriptArgs[0]);
 
     debug('_dirname:', _dirname);
+
+    const load_cjs_stub = std.loadScript(_dirname + "/../load_cjs_stub.js");
+
+    const load_cjs = (path) => load_cjs_stub(path, std.loadFile(path));
 
     const resolve = load_cjs(_dirname + "/../dist/util/resolve.js").resolve;
 
     // debug("resolve:", resolve)
 
-    const makeModule = std.loadScript(_dirname + "/../dist/module.js");
+    const makeModule = load_cjs(_dirname + "/../dist/module.js").makeModule;
 
     // debug("makeModule loaded", makeModule)
 

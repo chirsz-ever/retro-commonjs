@@ -5,8 +5,8 @@ function resolve(...paths: string[]): string {
     return resolve_(process.cwd(), ...paths);
 }
 
-import assert = require('node:assert');
-import path = require('node:path');
+const assert = require('node:assert');
+const path = require('node:path');
 const test = require('node:test');
 
 test('dirname', () => {

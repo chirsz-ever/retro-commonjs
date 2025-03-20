@@ -2,6 +2,7 @@
 
 import { existsSync } from "jsr:@std/fs";
 import { resolve } from "../util/resolve.ts";
+import makeModule from "../module.ts";
 
 if (Deno.args.length < 1) {
     const name = Deno.mainModule.substring(Deno.mainModule.lastIndexOf('/') + 1);
@@ -10,9 +11,6 @@ if (Deno.args.length < 1) {
 }
 
 const cwd = Deno.cwd();
-
-const moduleText = await Deno.readTextFile(new URL(import.meta.resolve("../dist/module.js")).pathname);
-const makeModule = eval(moduleText);
 
 const Module = makeModule({
     isFile(path) {
