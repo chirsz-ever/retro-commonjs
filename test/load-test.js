@@ -16,6 +16,7 @@ test('load', async () => {
             exec(`qjs --std "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
             exec(`node "${__dirname}/../runner/node-ses-my-module-load.js" "${mod}"`),
             exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`),
+            exec(`qjs --std "${__dirname}/../runner/qjs-ses-my-module-load.js" "${mod}"`),
         ])).map(r => r.stdout);
 
         for (let i = 1; i < results.length; i++) {
