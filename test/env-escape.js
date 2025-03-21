@@ -1,25 +1,22 @@
-console.log('globalThis.fetch:', globalThis.fetch);
-if (typeof window === 'undefined') {
-    console.log('window: undefined');
-} else {
-    console.log('window.fetch:', window.fetch);
+const test_code = (prompt, code_cbk) => {
+    try {
+        console.log(prompt, code_cbk());
+    } catch (e) {
+        console.log(prompt, e.name, e.message);
+    }
 }
-console.log('Function("return fetch"):', Function("return fetch")());
-console.log('eval("fetch"):', (0, eval)('fetch'));
 
-try {
+test_code('globalThis.fetch:', () => globalThis.fetch);
+test_code('window.fetch:', () => window.fetch);
+test_code('Function("return fetch"):', () => Function("return fetch")());
+test_code('eval("fetch"):', () => (0, eval)('fetch'));
+
+test_code('unscopables fetch:', () => {
     globalThis[Symbol.unscopables] = {
         fetch: true
     }
-    console.log('unscopables fetch:', fetch);
-} catch (e) {
-    console.log('unscopables fetch:', e.name, e.message);
-}
+    return fetch;
+});
 
 // only this works without lockdown
-try {
-    const fetch = (_ => 0).constructor('return fetch')();
-    console.log('constructor fetch:', fetch);
-} catch (e) {
-    console.log('constructor fetch:', e.name, e.message);
-}
+test_code('(_ => 0).constructor("return fetch")():', () => (_ => 0).constructor('return fetch')());

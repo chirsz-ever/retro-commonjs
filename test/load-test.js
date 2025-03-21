@@ -13,7 +13,7 @@ test('load', async () => {
             exec(`node "${__dirname}/../runner/node-load.js" "${mod}"`),
             exec(`node "${__dirname}/../runner/node-my-module-load.js" "${mod}"`),
             exec(`deno run -A "${__dirname}/../runner/deno-my-module-load.ts" "${mod}"`),
-            exec(`qjs "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
+            exec(`qjs --std "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
             exec(`node "${__dirname}/../runner/node-ses-my-module-load.js" "${mod}"`),
             exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`),
         ])).map(r => r.stdout);
