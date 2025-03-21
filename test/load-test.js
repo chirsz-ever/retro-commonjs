@@ -9,15 +9,34 @@ const exec = promisify(cp.exec);
 
 test('load', async () => {
     async function testLoad(mod) {
-        const results = (await Promise.all([
+        const tasks = [
             exec(`node "${__dirname}/../runner/node-load.js" "${mod}"`),
             exec(`node "${__dirname}/../runner/node-my-module-load.js" "${mod}"`),
-            exec(`deno run -A "${__dirname}/../runner/deno-my-module-load.ts" "${mod}"`),
-            exec(`qjs --std "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
             exec(`node "${__dirname}/../runner/node-ses-my-module-load.js" "${mod}"`),
-            exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`),
-            exec(`qjs --std "${__dirname}/../runner/qjs-ses-my-module-load.js" "${mod}"`),
-        ])).map(r => r.stdout);
+        ];
+
+        if (process.argv.includes("--test-deno")) {
+            tasks.push(
+                exec(`deno run -A "${__dirname}/../runner/deno-my-module-load.ts" "${mod}"`),
+                exec(`deno run -A "${__dirname}/../runner/deno-ses-my-module-load.ts" "${mod}"`),
+            );
+        }
+
+        if (process.argv.includes("--test-quickjs")) {
+            tasks.push(
+                exec(`qjs --std "${__dirname}/../runner/qjs-my-module-load.js" "${mod}"`),
+                exec(`qjs --std "${__dirname}/../runner/qjs-ses-my-module-load.js" "${mod}"`),
+            );
+        }
+
+        if (process.argv.includes("--test-jsc")) {
+            tasks.push(
+                exec(`jsc "${__dirname}/../runner/jsc-my-module-load.js" "${mod}"`),
+                exec(`jsc "${__dirname}/../runner/jsc-ses-my-module-load.js" "${mod}"`),
+            );
+        }
+
+        const results = (await Promise.all(tasks)).map(r => r.stdout);
 
         for (let i = 1; i < results.length; i++) {
             assert.strictEqual(results[0], results[i], `${mod} on index ${i}`);
