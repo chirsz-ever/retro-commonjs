@@ -3,17 +3,6 @@
 // Bellard's quickjs 2024-01-13 has some problems. It is recommended to use quickjs-ng.
 // Please run with `--std` flag.
 
-import '../node_modules/ses/dist/ses.mjs';
-
-// workaround for ses
-if (typeof console.error === "undefined") {
-    console.error = (...args) => {
-        std.err.printf("%s\n", args.map(String).join(''));
-    };
-}
-
-lockdown();
-
 function debug(...args) {
     if (0)
         console.log(...args);
@@ -39,6 +28,20 @@ if (typeof load_cjs_stub === "undefined") {
 }
 
 const load_cjs = (path) => load_cjs_stub(path, std.loadFile(path));
+
+// workaround for ses
+if (typeof console.error === "undefined") {
+    console.error = (...args) => {
+        std.err.printf("%s\n", args.map(String).join(''));
+    };
+}
+
+import '../node_modules/ses/dist/ses.mjs';
+
+// or you can
+// load_cjs(_dirname + "/../node_modules/ses/dist/ses.cjs")
+
+lockdown();
 
 const resolve = load_cjs(_dirname + "/../dist/util/resolve.js").resolve;
 
