@@ -136,3 +136,5 @@ dist
 .pnp.*
 
 /.vscode
+/package-lock.json
+/deno.lock
