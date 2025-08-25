@@ -47,9 +47,6 @@ const Module = makeModule({
     isFile(path) {
         return __builtin.isFile(path);
     },
-    isDirectory(path) {
-        return __builtin.isDirectory(path);
-    },
     readFileSync(path, _encoding) {
         return __builtin.loadFile(path);
     },

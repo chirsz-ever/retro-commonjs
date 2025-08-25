@@ -16,9 +16,6 @@ const Module = makeModule({
     isFile(path) {
         return existsSync(path, { isFile: true });
     },
-    isDirectory(path) {
-        return existsSync(path, { isDirectory: true });
-    },
     readFileSync(path, _encoding) {
         return Deno.readTextFileSync(path);
     },

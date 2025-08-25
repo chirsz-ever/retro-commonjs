@@ -67,10 +67,6 @@ c.globalThis.Module = makeModule({
         const [obj, err] = os.stat(path);
         return err === 0 && !!(obj.mode & os.S_IFREG);
     },
-    isDirectory(path) {
-        const [obj, err] = os.stat(path);
-        return err === 0 && !!(obj.mode & os.S_IFDIR);
-    },
     readFileSync(path, _encoding) {
         return std.loadFile(path);
     },

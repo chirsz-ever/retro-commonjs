@@ -14,9 +14,6 @@ const Module = makeModule({
     isFile(path) {
         return fs.existsSync(path) && fs.statSync(path).isFile();
     },
-    isDirectory(path) {
-        return fs.existsSync(path) && fs.statSync(path).isDirectory();
-    },
     readFileSync(path, encoding) {
         return fs.readFileSync(path, encoding);
     },

@@ -1,6 +1,5 @@
 interface ModuleConfig {
     isFile: (path: string) => boolean;
-    isDirectory: (path: string) => boolean;
     readFileSync(path: string, encoding: 'utf8'): string;
     resolve(base: string, relative: string): string;
     modulePathResolve(request: string, parent: Module | null): string | undefined;
